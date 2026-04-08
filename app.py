@@ -81,9 +81,11 @@ with col1:
         st.session_state.result = normalize_text(st.session_state.text_input)
 
 with col2:
-    if st.button("🗑️ Xóa"):
-        st.session_state.text_input = ""
-        st.session_state.result = ""
+    def clear_text():
+    st.session_state.text_input = ""
+    st.session_state.result = ""
+
+st.button("🗑️ Xóa", on_click=clear_text)
 
 with col3:
     paste = st.text_input("📥 Dán nhanh")
