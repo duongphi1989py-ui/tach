@@ -1,80 +1,111 @@
 import streamlit as st
 import re
 
-st.set_page_config(page_title="Text Cleaner", layout="centered")
+# ================= CONFIG =================
+st.set_page_config(
+    page_title="Text Cleaner PRO",
+    layout="centered",
+    page_icon="✨"
+)
 
+# ================= STYLE =================
+st.markdown("""
+<style>
+button {
+    border-radius: 10px !important;
+    height: 45px;
+    font-size: 16px !important;
+}
+textarea {
+    border-radius: 10px !important;
+}
+.block-container {
+    padding-top: 2rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ================= TEXT CLEAN =================
 def normalize_text(s: str) -> str:
     if not s:
         return ""
 
-    # 1. Xóa ngoặc kép
     s = s.replace('“', '').replace('”', '').replace('"', '')
-
-    # 2. Thay mọi loại dash bằng dấu chấm
     s = s.replace('-', '.').replace('–', '.').replace('—', '.')
-
-    # 3. Thay dấu ba chấm … bằng dấu chấm
     s = s.replace('…', '.')
-
-    # 4. Gom nhiều dấu chấm thành 1
     s = re.sub(r'\.{2,}', '.', s)
-
-    # 5. Loại bỏ ký tự không mong muốn (chỉ giữ chữ, số, dấu câu, khoảng trắng)
     s = re.sub(r"[^0-9A-Za-zÀ-ỹ.,;:?!()\s]", " ", s)
-
-    # 6. Gom nhiều khoảng trắng thành 1
     s = re.sub(r'\s+', ' ', s)
-
-    # 7. Xóa khoảng trắng thừa trước dấu câu
     s = re.sub(r'\s+([.,;:?!])', r'\1', s)
 
-   
-
-    # 9. Viết hoa đầu câu
     def capitalize_sentences(text):
         text = text.strip()
-        # Tách câu dựa trên dấu . ? !
         parts = re.split('([.?!]\s*)', text)
         fixed = []
         for i, seg in enumerate(parts):
-            if i % 2 == 0:  # đoạn văn
+            if i % 2 == 0:
                 if seg:
                     fixed.append(seg.strip().capitalize())
-            else:  # dấu câu
+            else:
                 fixed.append(seg)
         return ''.join(fixed).strip()
 
-    s = capitalize_sentences(s)
+    return capitalize_sentences(s)
 
-    return s
+# ================= SESSION =================
+if "text_input" not in st.session_state:
+    st.session_state.text_input = ""
 
-# ============================
-# Giao diện Streamlit
-# ============================
+if "result" not in st.session_state:
+    st.session_state.result = ""
 
-st.title("📝 Text Cleaner")
-st.write("Nhập văn bản cần chuẩn hóa. Phần mềm sẽ loại bỏ ký tự đặc biệt, "
-         "thay '-' và '…' bằng '.', gom nhiều dấu '.' thành 1, viết hoa đầu câu, "
-         "và đảm bảo sau dấu chấm có 1 khoảng trắng.")
+# ================= HEADER =================
+st.title("✨ Text Cleaner PRO")
+st.caption("Chuẩn hóa văn bản nhanh – gọn – đẹp")
 
-# Ô nhập văn bản
-input_text = st.text_area("Nhập văn bản gốc tại đây:", height=200)
+# ================= INPUT =================
+st.markdown("### 📝 Nhập văn bản")
 
-# Nút xử lý
-if st.button("🔄 Xử lý văn bản"):
-    cleaned = normalize_text(input_text)
-    if cleaned:
-        st.success("✅ Văn bản đã xử lý")
-        st.text_area("Kết quả:", cleaned, height=200, key="output")
+st.text_area(
+    "",
+    height=180,
+    key="text_input",
+    placeholder="Dán nội dung vào đây..."
+)
 
-        # Nút tải xuống file txt
-        st.download_button(
-            label="📥 Tải kết quả .txt",
-            data=cleaned,
-            file_name="ket_qua.txt",
-            mime="text/plain"
-        )
+# ================= BUTTONS =================
+col1, col2, col3 = st.columns(3)
 
-        st.info("👉 Bạn có thể copy trực tiếp từ ô 'Kết quả' hoặc tải file .txt về máy.")
-    else:
-        st.warning("⚠️ Không có nội dung để xử lý.")
+with col1:
+    if st.button("🚀 Xử lý"):
+        st.session_state.result = normalize_text(st.session_state.text_input)
+
+with col2:
+    if st.button("🗑️ Xóa"):
+        st.session_state.text_input = ""
+        st.session_state.result = ""
+
+with col3:
+    paste = st.text_input("📥 Dán nhanh")
+    if paste:
+        st.session_state.text_input = paste
+
+# ================= OUTPUT =================
+if st.session_state.result:
+    st.markdown("### ✅ Kết quả")
+
+    st.text_area(
+        "",
+        st.session_state.result,
+        height=180
+    )
+
+    # 🔥 COPY 1 CLICK
+    st.code(st.session_state.result, language="text")
+
+    # DOWNLOAD
+    st.download_button(
+        "📥 Tải file .txt",
+        data=st.session_state.result,
+        file_name="ket_qua.txt"
+    )
