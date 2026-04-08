@@ -82,8 +82,8 @@ with col1:
 
 with col2:
     def clear_text():
-    st.session_state.text_input = ""
-    st.session_state.result = ""
+        st.session_state.text_input = ""
+        st.session_state.result = ""
 
 st.button("🗑️ Xóa", on_click=clear_text)
 
