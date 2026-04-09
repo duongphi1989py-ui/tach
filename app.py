@@ -37,7 +37,7 @@ def normalize_text(s: str) -> str:
     
     s = re.sub(r'(\d+)\s*%', r'\1 phần trăm', s)
     s = re.sub(r'(\d+)\s*$', r'\1 đô la', s)
-    s = re.sub(r"[^0-9A-Za-zÀ-ỹ.,;:?!()%\s]", " ", s)
+    s = re.sub(r"[^0-9A-Za-zÀ-ỹ.,;:?!()$%\s]", " ", s)
     s = re.sub(r'\s+', ' ', s)
     s = re.sub(r'\s+([.,;:?!])', r'\1', s)
 
