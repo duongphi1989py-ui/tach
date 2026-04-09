@@ -34,7 +34,7 @@ def normalize_text(s: str) -> str:
     s = s.replace('-', '.').replace('–', '.').replace('—', '.')
     s = s.replace('…', '.')
     s = re.sub(r'\.{2,}', '.', s)
-    s = re.sub(r"[^0-9A-Za-zÀ-ỹ.,;:?!()\s]", " ", s)
+    s = re.sub(r"[^0-9A-Za-zÀ-ỹ.,;:?!()%$/+\s]", " ", s)
     s = re.sub(r'\s+', ' ', s)
     s = re.sub(r'\s+([.,;:?!])', r'\1', s)
 
